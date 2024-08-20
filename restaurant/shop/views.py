@@ -1,7 +1,4 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.template.context_processors import request
-from collections import Counter
 from .models import Produs, Categorie, Livrare
 
 
@@ -13,29 +10,47 @@ def homepage(request):
         id_categorie = int(request.GET.get('categorie'))
         categorie_obiect = Categorie.objects.get(id=id_categorie)
         produse = Produs.objects.filter(categorie=categorie_obiect ).all()
-        print(produse)
     else:
         produse = Produs.objects.all()
     categorii = Categorie.objects.all()
-    produse_din_cos = []
+
+    produse_cos = {}
     for id_produs in request.session['cos']:
-        produse_din_cos.append(Produs.objects.get(id=id_produs))
+        produs = Produs.objects.get(id=id_produs)
+        if id_produs not in produse_cos:
+            produse_cos[id_produs] = {
+                'nume': produs.nume,
+                'pret': produs.pret,
+                'count': 1
+            }
+        else:
+            produse_cos[id_produs]['count'] += 1
+
     context = {
         'produse': produse,
         'categorii': categorii,
-        'total': sum([produs.pret for produs in produse_din_cos])
+        'total': sum([obiect_produs['count'] * obiect_produs['pret'] for id_produs, obiect_produs in produse_cos.items()]),
     }
     return render(request, 'home.html', context)
 
 
 def checkout(request):
-    produse_cos = []
+    produse_cos = {}
     for id_produs in request.session['cos']:
-        produse_cos.append(Produs.objects.get(id=id_produs))
+        produs = Produs.objects.get(id=id_produs)
+        if id_produs not in produse_cos:
+            produse_cos[id_produs] = {
+                'nume': produs.nume,
+                'pret': produs.pret,
+                'count': 1
+            }
+        else:
+            produse_cos[id_produs]['count'] += 1
+
     context = {
         'produse': produse_cos,
-        'total': sum([produs.pret for produs in produse_cos]),
-        'nr_produse': len(produse_cos)
+        'total': sum([obiect_produs['count'] * obiect_produs['pret'] for id_produs, obiect_produs in produse_cos.items()]),
+        'nr_produse': sum([obiect_produs['count'] for id_produs, obiect_produs in produse_cos.items()])
     }
     return render(request, 'checkout.html', context)
 
@@ -43,12 +58,11 @@ def checkout(request):
 def adauga_in_cos(request, id_produs):
     produs = Produs.objects.get(id=id_produs)
     request.session['cos'].append(produs.id)
-    print(request.session['cos'])
+
     return redirect('homepage')
 
 
 def creste_cantitate_cos(request, id_produs):
-    produs = Produs.objects.get(id=id_produs)
     if 'cos' in request.session:
         request.session['cos'].append(id_produs)
         request.session.modified = True
@@ -64,6 +78,7 @@ def scadere_cantitate_cos(request, id_produs):
             pass
     return redirect('checkout')
 
+
 def finalizare_comanda(request):
     if request.method == 'POST':
         adresa = request.POST.get('adresa')
@@ -76,8 +91,8 @@ def finalizare_comanda(request):
         for produs in produse_cos:
             livrare.produse.add(produs)
         request.session['cos'] = []
-        request.session.modified=True
-        return redirect('homepage')
+        request.session.modified = True
+
     return redirect('homepage')
 
 
@@ -87,8 +102,6 @@ def comenzile_mele(request):
         'comenzi': comenzi
     }
 
-    tabel =  render(request, 'comenzi.html', context)
-
     Livrare.objects.all().delete()
 
-    return tabel
+    return render(request, 'comenzi.html', context)
