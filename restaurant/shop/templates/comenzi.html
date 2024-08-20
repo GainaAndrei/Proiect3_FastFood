@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Comenzile mele</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Adresa</th>
+            <th>Telefon</th>
+            <th>Metoda Plata</th>
+            <th>Produse</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for comanda in comenzi %}
+        <tr>
+            <td>{{ comanda.adresa }}</td>
+            <td>{{ comanda.numar_telefon }}</td>
+            <td>{{ comanda.metoda_plata }}</td>
+            <td>
+                <ul>
+                    {% for produs in comanda.produse.all %}
+                        <li>{{ produs.nume }} - {{ produs.pret }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'homepage' %}" class="btn btn-secondary">Inapoi la pagina principala</a>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+ <h1>Bun venit!</h1>
+<div class="d-flex justify-content-end">
+<a href="{% url 'checkout' %}" class = "btn btn-primary">
+    {{ total }} RON
+    <i class="bi bi-basket2"></i>
+</a>
+</div>
+<div class="row">
+    <div class="col-2">
+        <div class="card">
+            <div class="btn-group-vertical" role="group">
+                <a href="{% url 'comenzi' %}" class="btn btn-primary mb-3" style="background-color: red; border-color: red;">Comenzile mele</a>
+                <a class="btn btn-primary" href="/" style="background-color: black; border-color: black;">Toate</a>
+                {% for categorie in categorii %}
+                <a class="btn btn-primary" href="?categorie={{categorie.id}}">{{ categorie }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-10">
+        <div class="row">
+            {% if produse %}
+            {% for produs in produse %}
+            <div class="col-4 mb-4">
+                <img src="{{ produs.image.url }}" width="200" height="150" alt="{{ produs.nume }}">
+                <h6>{{ produs.nume }}</h6>
+                <p>{{ produs.descriere }}</p>
+                <p><b>{{ produs.pret }} RON</b></p>
+                <a href="{% url 'adauga_produs_in_cos' produs.id %}" class="btn btn-success">CUMPARA</a>
+            </div>
+            {% endfor %}
+                {% else %}
+                <h5 style="text-align: center;">Acest produs nu este disponibil.</h5>
+                {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

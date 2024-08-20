@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Finalizare comanda</h1>
+<h4>{{ nr_produse }} produse</h4>
+<div class="mb-4">
+    {% for produs in produse %}
+    <div class="card mb-3">
+        <div class='card-body'>
+            <h5 class='card-title'>{{ produs.nume }}</h5>
+            <p class='card-text'>Pret: {{ produs.pret }} RON</p>
+            <a href="{% url 'scadere_cantitate_cos' produs.id %}" class="btn btn-primary">-</a>
+            <a href="{% url 'creste_cantitate_cos' produs.id %}" class="btn btn-primary">+</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<p> De plata: <b> {{ total }} RON</b></p>
+<form action="{% url 'finalizare_comanda' %}" method="POST" class="mt-4">
+    {% csrf_token %}
+    <div class="form-group mb-3">
+        <label for="adresa">Adresa de livrare:</label>
+        <input type="text" class="form-control" id="adresa" name="adresa" required>
+    </div>
+    <div class="form-group mb-3">
+        <label for="numar_telefon">Numar de telefon:</label>
+        <input type="text" class="form-control" id="numar_telefon" name="numar_telefon" minlength="10" maxlength="10" required>
+    </div>
+    <div class="form-group mb-3">
+        <label for="metoda_plata">Metoda de plata:</label>
+        <select class="form-control" id="metoda_plata" name="metoda_plata"  required>
+            <option value="Numerar">Numerar</option>
+            <option value="card">Card</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Finalizare comanda</button>
+</form>
+<div class="d-flex justify-content-end">
+    <a href="{% url 'homepage' %}" class="btn btn-success mt-3">Inapoi la pagina principala</a>
+</div>
+{% endblock %}
