@@ -4,13 +4,14 @@
 <h1>Finalizare comanda</h1>
 <h4>{{ nr_produse }} produse</h4>
 <div class="mb-4">
-    {% for produs in produse %}
+    {% for produs_id, produs in produse.items %}
     <div class="card mb-3">
         <div class='card-body'>
             <h5 class='card-title'>{{ produs.nume }}</h5>
             <p class='card-text'>Pret: {{ produs.pret }} RON</p>
-            <a href="{% url 'scadere_cantitate_cos' produs.id %}" class="btn btn-primary">-</a>
-            <a href="{% url 'creste_cantitate_cos' produs.id %}" class="btn btn-primary">+</a>
+            <a href="{% url 'scadere_cantitate_cos' produs_id %}" class="btn btn-primary">-</a>
+            <a href="{% url 'creste_cantitate_cos' produs_id %}" class="btn btn-primary">+</a>
+            <h5>{{ produs.count }} cantitati</h5>
         </div>
     </div>
     {% endfor %}
